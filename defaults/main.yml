@@ -13,6 +13,10 @@ sonar_web_context: ''
 sonar_mysql_username: sonar
 sonar_mysql_password: sonar
 
+# Sonar run user and group.
+sonar_run_user: root
+sonar_run_group: root
+
 sonar_mysql_host: localhost
 sonar_mysql_port: "3306"
 sonar_mysql_database: sonar
