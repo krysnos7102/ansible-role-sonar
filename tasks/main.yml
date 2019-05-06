@@ -30,6 +30,13 @@
     mv /usr/local/{{ sonar_version_directory }} /usr/local/sonar
     creates=/usr/local/sonar/COPYING
 
+# change ownership
+- name: change ownership
+  file:
+    dest: /usr/local/sonar
+    owner: vagrant
+    group: vagrant
+
 - include: configure.yml
 
 - name: Symlink sonar bin.
