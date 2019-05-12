@@ -23,32 +23,44 @@
     src: "{{ workspace }}/{{ sonar_version_directory }}.zip"
     dest: /usr/local/
     copy: false
-    creates: /usr/local/sonar/COPYING
+    owner: "{{ sonar_run_user }}"
+    group: "{{ sonar_group_user }}"
+    # creates: "{{ sonar_directory }}"/COPYING
 
-- name: Move Sonar into place.
-  command: >
-    mv /usr/local/{{ sonar_version_directory }} /usr/local/sonar
-    creates=/usr/local/sonar/COPYING
-
-# change ownership
-- name: change ownership
+- name: Symlink sonar directory.
   file:
+    src: "{{ sonar_directory }}"
     dest: /usr/local/sonar
-    owner: vagrant
-    group: vagrant
+    owner: "{{ sonar_run_user }}"
+    group: "{{ sonar_group_user }}"
+    force: yes
+    state: link
+
+# - name: Move Sonar into place.
+#   command: >
+#     mv /usr/local/{{ sonar_version_directory }} "{{ sonar_directory }}"
+
+# creates="{{ sonar_directory }}"/COPYING
+
+- name: Change RUNUSER.
+  lineinfile:
+    dest: "{{ sonar_directory }}/bin/linux-x86-64/sonar.sh"
+    regexp: "^#RUN_AS_USER=$"
+    line: "RUN_AS_USER={{ sonar_run_user }}"
+    backrefs: true
 
 - include: configure.yml
 
 - name: Symlink sonar bin.
   file:
-    src: /usr/local/sonar/bin/linux-x86-64/sonar.sh
+    src: "{{ sonar_directory }}/bin/linux-x86-64/sonar.sh"
     dest: /usr/bin/sonar
     state: link
   register: sonar_symlink
 
 - name: Add sonar as init script for service management.
   file:
-    src: /usr/local/sonar/bin/linux-x86-64/sonar.sh
+    src: "{{ sonar_directory }}/bin/linux-x86-64/sonar.sh"
     dest: /etc/init.d/sonar
     state: link
   when: "ansible_service_mgr != 'systemd'"
@@ -57,8 +69,8 @@
   template:
     src: sonar.unit.j2
     dest: /etc/systemd/system/sonar.service
-    owner: root
-    group: root
+    owner: "{{ sonar_run_user }}"
+    group: "{{ sonar_group_user }}"
     mode: 0755
   when: "ansible_service_mgr == 'systemd'"
 

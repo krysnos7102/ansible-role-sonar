@@ -6,6 +6,7 @@ sonar_download_validate_certs: true
 sonar_version: 4.5.6
 sonar_download_url: "https://binaries.sonarsource.com/Distribution/sonarqube/sonarqube-{{ sonar_version }}.zip"
 sonar_version_directory: "sonarqube-{{ sonar_version }}"
+sonar_directory: "/usr/local/{{ sonar_version_directory }}"
 
 sonar_web_context: ''
 
@@ -21,3 +22,7 @@ sonar_mysql_allowed_hosts:
   - "127.0.0.1"
   - "::1"
   - "localhost"
+
+# Sonar run user and group.
+sonar_run_user: root
+sonar_run_group: root
