@@ -23,24 +23,14 @@
     src: "{{ workspace }}/{{ sonar_version_directory }}.zip"
     dest: /usr/local/
     copy: false
+    creates: "/usr/local/{{ sonar_version_directory }}/COPYING"
     owner: "{{ sonar_run_user }}"
-    group: "{{ sonar_group_user }}"
-    # creates: "{{ sonar_directory }}"/COPYING
+    group: "{{ sonar_run_group }}"
 
-- name: Symlink sonar directory.
-  file:
-    src: "{{ sonar_directory }}"
-    dest: /usr/local/sonar
-    owner: "{{ sonar_run_user }}"
-    group: "{{ sonar_group_user }}"
-    force: yes
-    state: link
-
-# - name: Move Sonar into place.
-#   command: >
-#     mv /usr/local/{{ sonar_version_directory }} "{{ sonar_directory }}"
-
-# creates="{{ sonar_directory }}"/COPYING
+- name: Move Sonar into place.
+  command: >
+    mv /usr/local/{{ sonar_version_directory }} {{ sonar_directory }}
+    creates="{{ sonar_directory }}/COPYING"
 
 - name: Change RUNUSER.
   lineinfile:
@@ -70,7 +60,7 @@
     src: sonar.unit.j2
     dest: /etc/systemd/system/sonar.service
     owner: "{{ sonar_run_user }}"
-    group: "{{ sonar_group_user }}"
+    group: "{{ sonar_run_group }}"
     mode: 0755
   when: "ansible_service_mgr == 'systemd'"
 
