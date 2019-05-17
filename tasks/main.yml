@@ -23,21 +23,20 @@
     src: "{{ workspace }}/{{ sonar_version_directory }}.zip"
     dest: /usr/local/
     copy: false
-    creates: "/usr/local/{{ sonar_version_directory }}/COPYING"
+    creates: "{{ sonar_directory }}/COPYING"
     owner: "{{ sonar_run_user }}"
     group: "{{ sonar_run_group }}"
 
 - name: Move Sonar into place.
   command: >
     mv /usr/local/{{ sonar_version_directory }} {{ sonar_directory }}
-    creates="{{ sonar_directory }}/COPYING"
 
 - name: Change RUNUSER.
   lineinfile:
     dest: "{{ sonar_directory }}/bin/linux-x86-64/sonar.sh"
     regexp: "^#RUN_AS_USER=$"
     line: "RUN_AS_USER={{ sonar_run_user }}"
-    backrefs: true
+    backrefs: true # so that it doesn't duplicate, i.e. allows task to be idempotent
 
 - include: configure.yml
 
